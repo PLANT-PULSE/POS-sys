@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reports & Analytics - RestaurantPOS</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <i class="fas fa-utensils"></i>
+      <span>RestaurantPOS</span>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Main</div>
+      <a href="dashboard.html" class="nav-item">
+        <i class="fas fa-chart-line"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="orders.html" class="nav-item">
+        <i class="fas fa-shopping-cart"></i>
+        <span>Orders / POS</span>
+      </a>
+      <a href="tables.html" class="nav-item">
+        <i class="fas fa-chair"></i>
+        <span>Tables</span>
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Management</div>
+      <a href="menu.html" class="nav-item">
+        <i class="fas fa-list"></i>
+        <span>Menu</span>
+      </a>
+      <a href="inventory.html" class="nav-item">
+        <i class="fas fa-box"></i>
+        <span>Inventory</span>
+      </a>
+      <a href="customers.html" class="nav-item">
+        <i class="fas fa-users"></i>
+        <span>Customers</span>
+      </a>
+      <a href="staff.html" class="nav-item">
+        <i class="fas fa-user-tie"></i>
+        <span>Staff</span>
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Analytics</div>
+      <a href="reports.html" class="nav-item active">
+        <i class="fas fa-chart-bar"></i>
+        <span>Reports</span>
+      </a>
+      <a href="expenses.html" class="nav-item">
+        <i class="fas fa-receipt"></i>
+        <span>Expenses</span>
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Settings</div>
+      <a href="settings.html" class="nav-item">
+        <i class="fas fa-cog"></i>
+        <span>Settings</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="main-container">
+    <!-- Top Bar -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="toggle-sidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h2 style="margin: 0; font-size: 1.3rem;">Reports & Analytics</h2>
+      </div>
+      <div class="topbar-right">
+        <button class="theme-toggle">
+          <i class="fas fa-moon"></i>
+        </button>
+        <div class="user-profile">
+          <div class="user-avatar">JM</div>
+          <div>
+            <div style="font-weight: 600; font-size: 0.95rem;">John Manager</div>
+            <div style="font-size: 0.8rem; opacity: 0.8;">Admin</div>
+          </div>
+        </div>
+        <a href="index.html" class="btn btn-outline btn-small">Logout</a>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-title">
+          <i class="fas fa-chart-bar" style="color: var(--primary-red);"></i>
+          <h1>Financial & Sales Analytics</h1>
+        </div>
+        <button class="btn btn-secondary">
+          <i class="fas fa-download"></i> Export PDF
+        </button>
+      </div>
+
+      <!-- Date Range Filter -->
+      <div class="card" style="margin-bottom: 2rem;">
+        <form id="date-range-form">
+          <div style="display: grid; grid-template-columns: 1fr 1fr auto auto; gap: 1rem; align-items: end;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>From Date</label>
+              <input type="date" value="2024-01-01">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>To Date</label>
+              <input type="date">
+            </div>
+            <button type="submit" class="btn btn-primary">Generate Report</button>
+            <button type="button" class="btn btn-secondary" style="margin-bottom: 0;">Reset Filters</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="grid grid-4">
+        <div class="stat-card">
+          <div class="stat-card-icon" style="color: var(--success-green);">💵</div>
+          <div class="stat-label">Total Revenue</div>
+          <div class="stat-value">$12,450</div>
+          <div class="stat-change positive"><i class="fas fa-arrow-up"></i> +15% vs last month</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-icon" style="color: var(--accent-gold);">📊</div>
+          <div class="stat-label">Profit</div>
+          <div class="stat-value">$4,200</div>
+          <div class="stat-change positive"><i class="fas fa-arrow-up"></i> +12% vs last month</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-icon" style="color: var(--info-blue);">🧾</div>
+          <div class="stat-label">Total Orders</div>
+          <div class="stat-value">287</div>
+          <div class="stat-change positive"><i class="fas fa-arrow-up"></i> +8 from yesterday</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-icon" style="color: var(--warning-orange);">💸</div>
+          <div class="stat-label">Avg Order Value</div>
+          <div class="stat-value">$43.38</div>
+          <div class="stat-change positive"><i class="fas fa-arrow-up"></i> +2.5% vs last month</div>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="grid grid-2" style="margin-top: 2rem;">
+        <!-- Revenue by Payment Method -->
+        <div class="card">
+          <h3>Revenue by Payment Method</h3>
+          <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span>Cash</span>
+                <span style="font-weight: 600;">$5,200 (42%)</span>
+              </div>
+              <div style="height: 8px; background: #eee; border-radius: 10px; overflow: hidden;">
+                <div style="height: 100%; background: var(--accent-gold); width: 42%;"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span>Card</span>
+                <span style="font-weight: 600;">$5,100 (41%)</span>
+              </div>
+              <div style="height: 8px; background: #eee; border-radius: 10px; overflow: hidden;">
+                <div style="height: 100%; background: var(--primary-red); width: 41%;"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span>Mobile Payment</span>
+                <span style="font-weight: 600;">$2,150 (17%)</span>
+              </div>
+              <div style="height: 8px; background: #eee; border-radius: 10px; overflow: hidden;">
+                <div style="height: 100%; background: var(--success-green); width: 17%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hourly Sales Trend -->
+        <div class="card">
+          <h3>Hourly Sales Trend (Today)</h3>
+          <div style="height: 250px; display: flex; align-items: flex-end; justify-content: space-around; gap: 0.5rem; margin-top: 1.5rem;">
+            <div style="flex: 1; background: var(--primary-red); height: 20%; border-radius: 8px 8px 0 0;"></div>
+            <div style="flex: 1; background: var(--primary-red); height: 35%; border-radius: 8px 8px 0 0;"></div>
+            <div style="flex: 1; background: var(--primary-red); height: 50%; border-radius: 8px 8px 0 0;"></div>
+            <div style="flex: 1; background: var(--primary-red); height: 75%; border-radius: 8px 8px 0 0;"></div>
+            <div style="flex: 1; background: var(--accent-gold); height: 85%; border-radius: 8px 8px 0 0;"></div>
+            <div style="flex: 1; background: var(--primary-red); height: 65%; border-radius: 8px 8px 0 0;"></div>
+            <div style="flex: 1; background: var(--primary-red); height: 40%; border-radius: 8px 8px 0 0;"></div>
+            <div style="flex: 1; background: var(--primary-red); height: 25%; border-radius: 8px 8px 0 0;"></div>
+          </div>
+          <div style="text-align: center; margin-top: 1rem; font-size: 0.85rem; color: #999;">
+            11am • 12pm • 1pm • 2pm • 3pm • 4pm • 5pm • 6pm
+          </div>
+        </div>
+      </div>
+
+      <!-- Sales Table -->
+      <div class="card" style="margin-top: 2rem;">
+        <h3 style="margin-bottom: 1.5rem;">Sales Transactions</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Date & Time</th>
+              <th>Number of Items</th>
+              <th>Amount</th>
+              <th>Payment Method</th>
+            </tr>
+          </thead>
+          <tbody id="sales-table">
+            <!-- Populated by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
