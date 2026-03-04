@@ -1,5 +1,13 @@
 'use client'
 
+// Food images for dashboard
+const foodImages: Record<string, string> = {
+  'Margherita Pizza': 'https://images.unsplash.com/photo-1604382355076-af4b0eb60143?w=200&h=200&fit=crop',
+  'Classic Burger': 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=200&fit=crop',
+  'Jollof Rice': 'https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=200&h=200&fit=crop',
+  'Grilled Chicken': 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=200&h=200&fit=crop',
+}
+
 export default function Home() {
   return (
     <>
@@ -116,13 +124,17 @@ export default function Home() {
         </div>
         <div className="grid grid-4">
           {[
-            { name: 'Margherita Pizza', orders: 89, price: '$12.99', emoji: '🍕' },
-            { name: 'Classic Burger', orders: 76, price: '$8.99', emoji: '🍔' },
-            { name: 'Jollof Rice', orders: 65, price: '$10.99', emoji: '🍝' },
-            { name: 'Grilled Chicken', orders: 48, price: '$14.99', emoji: '🍗' },
+            { name: 'Margherita Pizza', orders: 89, price: '$12.99', image: 'Margherita Pizza' },
+            { name: 'Classic Burger', orders: 76, price: '$8.99', image: 'Classic Burger' },
+            { name: 'Jollof Rice', orders: 65, price: '$10.99', image: 'Jollof Rice' },
+            { name: 'Grilled Chicken', orders: 48, price: '$14.99', image: 'Grilled Chicken' },
           ].map((item, idx) => (
             <div key={idx} className="card" style={{ textAlign: 'center', padding: '1rem' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>{item.emoji}</div>
+              <img 
+                src={foodImages[item.image]} 
+                alt={item.name}
+                style={{ width: '100%', height: '120px', objectFit: 'cover', borderRadius: '8px', marginBottom: '0.5rem' }}
+              />
               <div style={{ fontWeight: 600 }}>{item.name}</div>
               <div style={{ color: 'var(--primary-red)', fontWeight: 700 }}>{item.price}</div>
               <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem' }}>{item.orders} orders today</div>

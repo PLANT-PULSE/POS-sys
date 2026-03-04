@@ -1,8 +1,19 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, createContext, useContext, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+
+// Theme Context
+const ThemeContext = createContext<{
+  darkMode: boolean
+  toggleDarkMode: () => void
+}>({
+  darkMode: false,
+  toggleDarkMode: () => {}
+})
+
+export const useTheme = () => useContext(ThemeContext)
 
 const navItems = [
   {
@@ -40,10 +51,21 @@ const navItems = [
 export default function Sidebar({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
+  const [darkMode, setDarkMode] = useState(false)
+
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('dark-mode')
+    } else {
+      document.body.classList.remove('dark-mode')
+    }
+  }, [darkMode])
+
+  const toggleDarkMode = () => setDarkMode(!darkMode)
 
   return (
-    <>
-      <div className={`layout ${collapsed ? 'collapsed' : ''}`}>
+    <ThemeContext.Provider value={{ darkMode, toggleDarkMode }}>
+      <div className={`layout ${collapsed ? 'collapsed' : ''} ${darkMode ? 'dark' : ''}`}>
         {/* Sidebar */}
         <aside className="sidebar">
           <div className="sidebar-logo">
@@ -81,8 +103,8 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
               </h2>
             </div>
             <div className="topbar-right">
-              <button className="theme-toggle">
-                <i className="fas fa-moon"></i>
+              <button className="theme-toggle" onClick={toggleDarkMode}>
+                <i className={`fas fa-${darkMode ? 'sun' : 'moon'}`}></i>
               </button>
               <div className="user-profile">
                 <div className="user-avatar">JM</div>
@@ -103,7 +125,6 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
 
       <style jsx global>{`
         :root {
-          --primary-dark: #1a1a1a;
           --primary-red: #c41e3a;
           --primary-green: #2d5016;
           --secondary-cream: #f5f1e8;
@@ -112,26 +133,55 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
           --text-dark: #2c2c2c;
           --text-light: #f5f1e8;
           --border-color: rgba(212, 175, 55, 0.2);
-          --glass-bg: rgba(255, 255, 255, 0.1);
-          --glass-bg-dark: rgba(26, 26, 26, 0.8);
           --success-green: #10b981;
           --warning-orange: #f59e0b;
           --danger-red: #ef4444;
           --info-blue: #3b82f6;
           --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
+          --card-bg: white;
+          --topbar-bg: white;
         }
 
         body {
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
           background: linear-gradient(135deg, #f5f1e8 0%, #e8e3d8 100%);
           color: var(--text-dark);
-          overflow-x: hidden;
+        }
+
+        body.dark-mode, .layout.dark {
+          --card-bg: #2d2d2d;
+          --topbar-bg: #1a1a1a;
+          background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+          color: var(--text-light);
+        }
+
+        body.dark-mode .card, .layout.dark .card {
+          background: var(--card-bg);
+          border-color: rgba(212, 175, 55, 0.3);
+        }
+
+        body.dark-mode .topbar, .layout.dark .topbar {
+          background: var(--topbar-bg);
+          border-color: rgba(212, 175, 55, 0.3);
+        }
+
+        body.dark-mode input, body.dark-mode textarea, body.dark-mode select,
+        .layout.dark input, .layout.dark textarea, .layout.dark select {
+          background: rgba(255, 255, 255, 0.1);
+          border-color: rgba(212, 175, 55, 0.3);
+          color: var(--text-light);
+        }
+
+        body.dark-mode .user-profile, .layout.dark .user-profile {
+          background: rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .toggle-sidebar, body.dark-mode .theme-toggle,
+        .layout.dark .toggle-sidebar, .layout.dark .theme-toggle {
+          color: var(--text-light);
+        }
+
+        body.dark-mode .table th, .layout.dark .table th {
+          color: var(--text-light);
         }
 
         .layout {
@@ -254,28 +304,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
           gap: 1rem;
         }
 
-        .toggle-sidebar {
-          background: none;
-          border: none;
-          cursor: pointer;
-          font-size: 1.5rem;
-          color: var(--text-dark);
-          padding: 0.5rem;
-          border-radius: 8px;
-          transition: var(--transition-smooth);
-        }
-
-        .toggle-sidebar:hover {
-          background: var(--secondary-cream);
-        }
-
-        .topbar-right {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-        }
-
-        .theme-toggle {
+        .toggle-sidebar, .theme-toggle {
           background: none;
           border: none;
           cursor: pointer;
@@ -286,8 +315,14 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
           transition: var(--transition-smooth);
         }
 
-        .theme-toggle:hover {
+        .toggle-sidebar:hover, .theme-toggle:hover {
           background: var(--secondary-cream);
+        }
+
+        .topbar-right {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
         }
 
         .user-profile {
@@ -316,7 +351,6 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
           padding: 2rem;
         }
 
-        /* Common Components */
         .card {
           background: white;
           border-radius: 12px;
@@ -363,6 +397,16 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
           color: var(--primary-red);
         }
 
+        .btn-danger {
+          background: var(--danger-red);
+          color: white;
+        }
+
+        .btn-small {
+          padding: 0.5rem 1rem;
+          font-size: 0.85rem;
+        }
+
         .page-header {
           margin-bottom: 2rem;
           display: flex;
@@ -386,17 +430,9 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
           gap: 1.5rem;
         }
 
-        .grid-2 {
-          grid-template-columns: repeat(2, 1fr);
-        }
-
-        .grid-3 {
-          grid-template-columns: repeat(3, 1fr);
-        }
-
-        .grid-4 {
-          grid-template-columns: repeat(4, 1fr);
-        }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
 
         .form-group {
           margin-bottom: 1.5rem;
@@ -474,24 +510,70 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
           color: var(--success-green);
         }
 
+        /* Modal Styles */
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+        }
+
+        .modal-content {
+          background: white;
+          border-radius: 12px;
+          padding: 2rem;
+          width: 90%;
+          max-width: 500px;
+          max-height: 90vh;
+          overflow-y: auto;
+        }
+
+        .layout.dark .modal-content {
+          background: #2d2d2d;
+          color: var(--text-light);
+        }
+
+        .modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+          margin: 0;
+        }
+
+        .modal-close {
+          background: none;
+          border: none;
+          font-size: 1.5rem;
+          cursor: pointer;
+          color: #666;
+        }
+
+        .modal-actions {
+          display: flex;
+          gap: 1rem;
+          margin-top: 1.5rem;
+        }
+
         @media (max-width: 1024px) {
-          .grid-4 {
-            grid-template-columns: repeat(2, 1fr);
-          }
+          .grid-4 { grid-template-columns: repeat(2, 1fr); }
         }
 
         @media (max-width: 768px) {
-          .sidebar {
-            width: 80px;
-          }
-          .main-container {
-            margin-left: 80px;
-          }
-          .grid-2, .grid-3, .grid-4 {
-            grid-template-columns: 1fr;
-          }
+          .sidebar { width: 80px; }
+          .main-container { margin-left: 80px; }
+          .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
         }
       `}</style>
-    </>
+    </ThemeContext.Provider>
   )
 }

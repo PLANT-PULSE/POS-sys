@@ -1,20 +1,33 @@
 'use client'
 
+import { useState } from 'react'
+
+interface Table {
+  id: number
+  status: 'occupied' | 'available' | 'reserved' | 'cleaning'
+  guest: string | null
+  time: string | null
+  capacity: number
+}
+
 export default function TablesPage() {
-  const tables = [
-    { id: 1, status: 'occupied', guest: 'John Doe', time: '45 min' },
-    { id: 2, status: 'available', guest: null, time: null },
-    { id: 3, status: 'occupied', guest: 'Jane Smith', time: '20 min' },
-    { id: 4, status: 'reserved', guest: 'Mike Johnson', time: '18:00' },
-    { id: 5, status: 'available', guest: null, time: null },
-    { id: 6, status: 'cleaning', guest: null, time: null },
-    { id: 7, status: 'available', guest: null, time: null },
-    { id: 8, status: 'occupied', guest: 'Sarah Williams', time: '1h 10min' },
-    { id: 9, status: 'reserved', guest: 'Tom Brown', time: '19:00' },
-    { id: 10, status: 'occupied', guest: 'Emily Davis', time: '35 min' },
-    { id: 11, status: 'available', guest: null, time: null },
-    { id: 12, status: 'cleaning', guest: null, time: null },
-  ]
+  const [tables, setTables] = useState<Table[]>([
+    { id: 1, status: 'occupied', guest: 'John Doe', time: '45 min', capacity: 4 },
+    { id: 2, status: 'available', guest: null, time: null, capacity: 2 },
+    { id: 3, status: 'occupied', guest: 'Jane Smith', time: '20 min', capacity: 6 },
+    { id: 4, status: 'reserved', guest: 'Mike Johnson', time: '18:00', capacity: 4 },
+    { id: 5, status: 'available', guest: null, time: null, capacity: 8 },
+    { id: 6, status: 'cleaning', guest: null, time: null, capacity: 4 },
+    { id: 7, status: 'available', guest: null, time: null, capacity: 2 },
+    { id: 8, status: 'occupied', guest: 'Sarah Williams', time: '1h 10min', capacity: 6 },
+    { id: 9, status: 'reserved', guest: 'Tom Brown', time: '19:00', capacity: 4 },
+    { id: 10, status: 'occupied', guest: 'Emily Davis', time: '35 min', capacity: 8 },
+  ])
+
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [selectedTableId, setSelectedTableId] = useState<number | null>(null)
+  const [newTable, setNewTable] = useState({ capacity: 4 })
 
   const statusColors: Record<string, string> = {
     occupied: '#10b981',
@@ -35,6 +48,30 @@ export default function TablesPage() {
   const reservedCount = tables.filter(t => t.status === 'reserved').length
   const cleaningCount = tables.filter(t => t.status === 'cleaning').length
 
+  const addTable = () => {
+    const newId = Math.max(...tables.map(t => t.id), 0) + 1
+    setTables([...tables, {
+      id: newId,
+      status: 'available',
+      guest: null,
+      time: null,
+      capacity: newTable.capacity
+    }])
+    setShowAddModal(false)
+    setNewTable({ capacity: 4 })
+  }
+
+  const deleteTable = (id: number) => {
+    setTables(tables.filter(t => t.id !== id))
+    setShowDeleteModal(false)
+    setSelectedTableId(null)
+  }
+
+  const openDeleteModal = (id: number) => {
+    setSelectedTableId(id)
+    setShowDeleteModal(true)
+  }
+
   return (
     <>
       {/* Page Header */}
@@ -43,7 +80,7 @@ export default function TablesPage() {
           <i className="fas fa-chair" style={{ color: 'var(--primary-red)', fontSize: '2rem' }}></i>
           <h1>Table Management</h1>
         </div>
-        <button className="btn btn-primary">
+        <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
           <i className="fas fa-plus"></i> Add Table
         </button>
       </div>
@@ -86,7 +123,8 @@ export default function TablesPage() {
                 border: `2px solid ${statusColors[table.status]}`,
                 textAlign: 'center',
                 cursor: 'pointer',
-                transition: 'transform 0.2s'
+                transition: 'transform 0.2s',
+                position: 'relative'
               }}
               onMouseOver={(e) => {
                 e.currentTarget.style.transform = 'scale(1.02)'
@@ -95,6 +133,30 @@ export default function TablesPage() {
                 e.currentTarget.style.transform = 'scale(1)'
               }}
             >
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  openDeleteModal(table.id)
+                }}
+                style={{
+                  position: 'absolute',
+                  top: '0.5rem',
+                  right: '0.5rem',
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '50%',
+                  border: 'none',
+                  background: 'var(--danger-red)',
+                  color: 'white',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '0.8rem'
+                }}
+              >
+                ×
+              </button>
               <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🪑</div>
               <div style={{ fontWeight: 600 }}>Table {table.id}</div>
               <div style={{ fontSize: '0.85rem', color: statusColors[table.status], textTransform: 'capitalize' }}>
@@ -105,6 +167,9 @@ export default function TablesPage() {
                   {table.guest} • {table.time}
                 </div>
               )}
+              <div style={{ fontSize: '0.75rem', color: '#999', marginTop: '0.25rem' }}>
+                Capacity: {table.capacity}
+              </div>
             </div>
           ))}
         </div>
@@ -133,7 +198,7 @@ export default function TablesPage() {
                 <td>Today, 7:00 PM</td>
                 <td><span style={{ color: 'var(--warning-orange)', fontWeight: 600 }}>Reserved</span></td>
                 <td>
-                  <button className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>Seat</button>
+                  <button className="btn btn-primary btn-small">Seat</button>
                 </td>
               </tr>
               <tr>
@@ -143,7 +208,7 @@ export default function TablesPage() {
                 <td>Today, 8:00 PM</td>
                 <td><span style={{ color: 'var(--warning-orange)', fontWeight: 600 }}>Reserved</span></td>
                 <td>
-                  <button className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>Seat</button>
+                  <button className="btn btn-primary btn-small">Seat</button>
                 </td>
               </tr>
               <tr>
@@ -153,13 +218,77 @@ export default function TablesPage() {
                 <td>Tomorrow, 6:00 PM</td>
                 <td><span style={{ color: '#8b5cf6', fontWeight: 600 }}>Confirmed</span></td>
                 <td>
-                  <button className="btn" style={{ border: '1px solid var(--primary-red)', color: 'var(--primary-red)', background: 'transparent', padding: '0.5rem 1rem', fontSize: '0.85rem' }}>Edit</button>
+                  <button className="btn btn-outline btn-small">Edit</button>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
+
+      {/* Add Table Modal */}
+      {showAddModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>Add New Table</h2>
+              <button className="modal-close" onClick={() => setShowAddModal(false)}>×</button>
+            </div>
+            
+            <div className="form-group">
+              <label>Table Capacity (seats)</label>
+              <select 
+                value={newTable.capacity}
+                onChange={(e) => setNewTable({ capacity: parseInt(e.target.value) })}
+              >
+                <option value={2}>2 Seats</option>
+                <option value={4}>4 Seats</option>
+                <option value={6}>6 Seats</option>
+                <option value={8}>8 Seats</option>
+                <option value={10}>10 Seats</option>
+              </select>
+            </div>
+
+            <div className="modal-actions">
+              <button className="btn btn-primary" style={{ flex: 1 }} onClick={addTable}>
+                <i className="fas fa-plus"></i> Add Table
+              </button>
+              <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => setShowAddModal(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>Delete Table</h2>
+              <button className="modal-close" onClick={() => setShowDeleteModal(false)}>×</button>
+            </div>
+            
+            <p style={{ marginBottom: '1.5rem' }}>
+              Are you sure you want to delete Table {selectedTableId}? This action cannot be undone.
+            </p>
+
+            <div className="modal-actions">
+              <button 
+                className="btn btn-danger" 
+                style={{ flex: 1, background: 'var(--danger-red)' }} 
+                onClick={() => selectedTableId && deleteTable(selectedTableId)}
+              >
+                <i className="fas fa-trash"></i> Delete
+              </button>
+              <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => setShowDeleteModal(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
