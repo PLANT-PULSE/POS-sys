@@ -1,0 +1,139 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  Admin
+  Manager
+  Cashier
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(Cashier)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  sales     Sale[]
+  auditLogs AuditLog[]
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  description String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  products    Product[]
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  sku         String   @unique
+  description String?
+  price       Float
+  stock       Int      @default(0)
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  inventoryTransactions InventoryTransaction[]
+  saleItems             SaleItem[]
+}
+
+enum TransactionType {
+  IN
+  OUT
+  ADJUSTMENT
+}
+
+model InventoryTransaction {
+  id        String          @id @default(uuid())
+  productId String
+  product   Product         @relation(fields: [productId], references: [id])
+  type      TransactionType
+  quantity  Int
+  remarks   String?
+  createdAt DateTime        @default(now())
+}
+
+enum SaleStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+model Sale {
+  id            String     @id @default(uuid())
+  receiptNumber String     @unique
+  totalAmount   Float
+  discount      Float      @default(0)
+  tax           Float      @default(0)
+  finalAmount   Float
+  status        SaleStatus @default(COMPLETED)
+  cashierId     String
+  cashier       User       @relation(fields: [cashierId], references: [id])
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  // Relations
+  items    SaleItem[]
+  payments Payment[]
+}
+
+model SaleItem {
+  id        String  @id @default(uuid())
+  saleId    String
+  sale      Sale    @relation(fields: [saleId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float   // Price at time of sale
+  subtotal  Float
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  ONLINE
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  saleId        String
+  sale          Sale          @relation(fields: [saleId], references: [id])
+  amount        Float
+  method        PaymentMethod
+  transactionId String?       // For online/card payments
+  status        String        @default("SUCCESS")
+  createdAt     DateTime      @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  entity    String   // e.g., 'Product', 'User'
+  entityId  String?
+  details   Json?
+  createdAt DateTime @default(now())
+}
