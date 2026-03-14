@@ -3,6 +3,7 @@
 import { useState, createContext, useContext, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 // Theme Context
 const ThemeContext = createContext<{
@@ -52,6 +53,8 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
+  const isMobile = useIsMobile()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     if (darkMode) {
@@ -65,6 +68,47 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeContext.Provider value={{ darkMode, toggleDarkMode }}>
+      {/* Mobile Menu Overlay */}
+      {isMobile && mobileMenuOpen && (
+        <div className="mobile-menu-overlay" onClick={() => setMobileMenuOpen(false)}>
+          <div className="mobile-menu-content" onClick={(e) => e.stopPropagation()}>
+            <div className="mobile-menu-header">
+              <div className="sidebar-logo">
+                <i className="fas fa-utensils"></i>
+                <span>RestaurantPOS</span>
+              </div>
+              <button className="mobile-menu-close" onClick={() => setMobileMenuOpen(false)}>
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <nav className="mobile-nav">
+              {navItems.map((section) => (
+                <div className="nav-section" key={section.title}>
+                  <div className="nav-section-title">{section.title}</div>
+                  {section.items.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`nav-item ${pathname === item.href ? 'active' : ''}`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <i className={`fas fa-${item.icon}`}></i>
+                      <span>{item.name}</span>
+                    </Link>
+                  ))}
+                </div>
+              ))}
+            </nav>
+            <div className="mobile-menu-footer">
+              <button className="theme-toggle-btn" onClick={toggleDarkMode}>
+                <i className={`fas fa-${darkMode ? 'sun' : 'moon'}`}></i>
+                <span>{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className={`layout ${collapsed ? 'collapsed' : ''} ${darkMode ? 'dark' : ''}`}>
         {/* Sidebar */}
         <aside className="sidebar">
@@ -95,24 +139,38 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
           {/* Top Bar */}
           <header className="topbar">
             <div className="topbar-left">
-              <button className="toggle-sidebar" onClick={() => setCollapsed(!collapsed)}>
-                <i className="fas fa-bars"></i>
-              </button>
-              <h2 style={{ margin: 0, fontSize: '1.3rem' }}>
+              {isMobile && (
+                <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(true)}>
+                  <i className="fas fa-bars"></i>
+                </button>
+              )}
+              {!isMobile && (
+                <button className="toggle-sidebar" onClick={() => setCollapsed(!collapsed)}>
+                  <i className="fas fa-bars"></i>
+                </button>
+              )}
+              <h2 style={{ margin: 0, fontSize: isMobile ? '1rem' : '1.3rem' }}>
                 {navItems.flatMap(s => s.items).find(i => i.href === pathname)?.name || 'POS System'}
               </h2>
             </div>
             <div className="topbar-right">
-              <button className="theme-toggle" onClick={toggleDarkMode}>
-                <i className={`fas fa-${darkMode ? 'sun' : 'moon'}`}></i>
-              </button>
-              <div className="user-profile">
-                <div className="user-avatar">JM</div>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>John Manager</div>
-                  <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>Admin</div>
+              {!isMobile && (
+                <button className="theme-toggle" onClick={toggleDarkMode}>
+                  <i className={`fas fa-${darkMode ? 'sun' : 'moon'}`}></i>
+                </button>
+              )}
+              {!isMobile && (
+                <div className="user-profile">
+                  <div className="user-avatar">JM</div>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>John Manager</div>
+                    <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>Admin</div>
+                  </div>
                 </div>
-              </div>
+              )}
+              {isMobile && (
+                <div className="user-avatar-small">JM</div>
+              )}
             </div>
           </header>
 
